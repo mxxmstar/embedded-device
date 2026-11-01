@@ -1,0 +1,13 @@
+# Can run on x86 independently of the project and its platform SDKs.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    cmake_minimum_required(VERSION 3.21)
+    project(isp_lifecycle_tests LANGUAGES CXX)
+    enable_testing()
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+add_executable(test_isp_controller test_isp_controller.cpp ../src/isp_controller.cpp)
+target_include_directories(test_isp_controller PRIVATE ../include ../src)
+target_compile_options(test_isp_controller PRIVATE -Wall -Wextra -Wpedantic)
+add_test(NAME isp_controller_lifecycle COMMAND test_isp_controller)
+set_tests_properties(isp_controller_lifecycle PROPERTIES TIMEOUT 10)

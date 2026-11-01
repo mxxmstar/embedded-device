@@ -1,7 +1,5 @@
 # Rockchip / NanoPC-T4 构建与依赖交叉编译
 
-本文命令除标注“设备端”外，均在 Ubuntu 虚拟机执行。维护日期：2026-10-29。
-
 ## 1. 环境与目录
 
 | 项目 | 当前环境 |
@@ -40,9 +38,9 @@ platform/rockchip/
         └── lib/
 ```
 
-sysroot 提供设备基础头文件、启动文件和系统库；deps 放工程单独编译的第三方 SDK。不要将虚拟机 x86_64 库复制进 ARM64 目录。
+sysroot 提供设备基础头文件、启动文件和系统库；deps 放工程单独编译的第三方 SDK 和部分 rk 平台的库。
 
-平台目录不放 C++ 业务实现。公共入口为 `include/common/process/process.h`，平台头文件位于 `include/common/process/generic/`、`include/common/process/rockchip/`；对应实现位于 `src/common/process/generic/`、`src/common/process/rockchip/`。各子平台 CMake 独立管理依赖，业务目标通过 `Embedded::Platform` 获得平台宏及链接依赖。
+各子平台 CMake 独立管理依赖，业务目标通过 `Platform` 获得平台宏及链接依赖。
 
 ## 2. 准备编译工具与 sysroot
 
@@ -60,8 +58,7 @@ sudo apt-get install -y g++-12-aarch64-linux-gnu cmake make python3 tar pkg-conf
 
 ```bash
 scp platform/rockchip/export-sysroot.py pi@192.168.66.6:/tmp/export-sysroot.py
-ssh pi@192.168.66.6 \
-  'python3 /tmp/export-sysroot.py /tmp/nanopc-t4-sysroot.tar.gz'
+ssh pi@192.168.66.6 'python3 /tmp/export-sysroot.py /tmp/nanopc-t4-sysroot.tar.gz'
 scp pi@192.168.66.6:/tmp/nanopc-t4-sysroot.tar.gz /tmp/nanopc-t4-sysroot.tar.gz
 
 # 仅用于尚未配置的 sysroot；已有环境不要直接覆盖混装。
@@ -225,3 +222,8 @@ if (child.Start(options, ec)) child.Wait(ec);
 RK AsyncWait 回调在子进程回收线程执行；注册时已结束则在调用线程执行。回调不允许抛出异常，不应阻塞等待其他回调。Reset/析构会终止并回收仍运行的直接子进程，不管理整个进程树。GUI/新终端选项返回 operation_not_supported。生命周期操作需调用方串行化，查询、信号与等待可并发。
 
 MediaStreamSession 使用无参构造，内部仍是原有 std::thread 模型，已移除从未使用的 Boost io_context 参数。generic Process 保留原 Boost API，RK Process 使用 std::error_code 与无参构造。
+
+
+## RK3399 legacy ISP controller
+
+See [IspController](../../modules/isp/README.md) for library export, IQ selection, API lifecycle and board verification. This module is independent of the FFmpeg media backend.

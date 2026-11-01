@@ -9,6 +9,11 @@ option(MEDIA_FFMPEG_FULL "Build the full FFmpeg media pipeline" ${_ffmpeg_defaul
 
 # rk平台编译选项
 option(MEDIA_FFMPEG_ROCKCHIP "Build the Rockchip FFmpeg modules (currently pusher and sessions)" OFF)
+set(_isp_default OFF)
+if(EMBEDDED_PLATFORM STREQUAL "rockchip")
+    set(_isp_default ON)
+endif()
+option(BUILD_ISP "Build the legacy RK3399 ISP controller" ${_isp_default})
 option(BUILD_MEDIA "Build media capture, codecs and streaming" ON)
 option(BUILD_RENDER "Build OpenGL rendering" ${EMBEDDED_DEFAULT_BUILD_RENDER})
 option(BUILD_TESTS "Build test programs" ON)
