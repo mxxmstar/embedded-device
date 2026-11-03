@@ -15,6 +15,7 @@
 #include <sys/eventfd.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <linux/v4l2-subdev.h>
 
 namespace {
 /// @brief 执行 ioctl 操作，处理 EINTR 错误
@@ -271,23 +272,11 @@ CaptureOpenResult V4L2VideoCapture::Open() {
     }    
 
     // 设置视频采集帧率
-    v4l2_streamparm parameters{};
-    parameters.type = is_mplane_ ? V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE : V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (Ioctl(device_fd_, VIDIOC_G_PARM, &parameters) < 0) return failed(NativeError("G_PARM", errno));
-    if (!(parameters.parm.capture.capability & V4L2_CAP_TIMEPERFRAME)) {
-        return failed({CaptureErrorCategory::Unsupported, 0, "Device has no configurable frame interval", false});
-    }
-    parameters.parm.capture.timeperframe = {static_cast<unsigned int>(config_.frame_rate.den), static_cast<unsigned int>(config_.frame_rate.num)};
-    if (Ioctl(device_fd_, VIDIOC_S_PARM, &parameters) < 0) {
-        return failed(NativeError("S_PARM", errno));
-    }
-    if (Ioctl(device_fd_, VIDIOC_G_PARM, &parameters) < 0) {
-        return failed(NativeError("G_PARM", errno));
-    }
-    const auto interval = parameters.parm.capture.timeperframe;
-    if (interval.numerator == 0 || interval.denominator == 0 || interval.numerator > INT_MAX || interval.denominator > INT_MAX ||
-        (!config_.allow_negotiation && static_cast<uint64_t>(interval.numerator) * config_.frame_rate.num != static_cast<uint64_t>(interval.denominator) * config_.frame_rate.den)) {
-        return failed({CaptureErrorCategory::Unsupported, 0, "Device adjusted requested capture frame rate", false});
+    v4l2_fract interval{};
+    const char* interval_operation = nullptr;
+    v4l2_buf_type capture_type = is_mplane_ ? V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE : V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    if (const int error = ConfigureFrameInterval(device_fd_, capture_type, config_, interval, interval_operation)) {
+        return failed(NativeError(interval_operation, error));
     }
 
     // struct CaptureVideoInfo {
@@ -433,13 +422,16 @@ CaptureReadResult V4L2VideoCapture::ReadFrame() {
     std::optional<CaptureError> copy_error;
     try {
         if (buffer.flags & V4L2_BUF_FLAG_ERROR) {
-            LOG_WARN("Driver marked capture frame damaged");
+            LOG_WARN("Driver marked capture frame damaged");            
             throw std::invalid_argument("Driver marked capture frame damaged");
         }
+#if !defined(MEDIA_CAPTURE_RKISP)
         if (buffer.field != V4L2_FIELD_NONE) {
             LOG_WARN("Captured frame is not progressive");
+            LOG_WARN("Captured frame field={} (expected NONE)", static_cast<int>(buffer.field));
             throw std::invalid_argument("Captured frame is not progressive");
         }
+#endif
 
         const auto lease_view = lease->View();
         const auto stride = plane_geometry_.empty() ? 0 : static_cast<int>(plane_geometry_[0].stride);
@@ -577,4 +569,76 @@ void V4L2VideoCapture::cleanup() noexcept {
     }
     info_ = {};
     plane_geometry_.clear();
+}
+
+int V4L2VideoCapture::readSensorInterval(v4l2_fract& interval, const char*& operation) {
+    if (config_.frame_interval_device.empty()) {
+        operation = "G_PARM unsupported; provide frame_interval_device for sensor interval query";
+        return ENOTTY;
+    }
+    const int fd = ::open(config_.frame_interval_device.c_str(), O_RDONLY | O_CLOEXEC);
+    if (fd < 0) {
+        operation = "open frame interval sensor";
+        return errno;
+    }
+    v4l2_subdev_frame_interval sensor{};
+    sensor.pad = config_.frame_interval_pad;
+    // 获取 v4l-subdevX 设备的帧间隔信息
+    const int result = Ioctl(fd, VIDIOC_SUBDEV_G_FRAME_INTERVAL, &sensor);
+    const int error = result < 0 ? errno : 0;
+    ::close(fd);
+    if (error) {
+        operation = "VIDIOC_SUBDEV_G_FRAME_INTERVAL";
+        return error;
+    }
+    interval = sensor.interval;
+    return 0;
+}
+
+int V4L2VideoCapture::ConfigureFrameInterval(int video_fd, v4l2_buf_type type, const V4L2CaptureConfig& config, v4l2_fract& interval, const char*& operation) {
+    interval = {};
+    operation = "G_PARM";
+    v4l2_streamparm parameters{};
+    parameters.type = type;
+    // 通过视频节点获取参数，检查是否支持设置时间帧
+    if (Ioctl(video_fd, VIDIOC_G_PARM, &parameters) < 0) {
+        const int error = errno;        
+        if (error != ENOTTY) {
+            return error;   // 其他错误，直接返回
+        }
+        // 视频节点不支持设置时间帧，尝试读取传感器帧间隔
+        if (const int fallback = readSensorInterval(interval, operation)) {
+            operation = "VIDIOC_G_PARM";
+            return fallback;
+        }
+    } else {
+        // 视频节点支持设置时间帧，尝试设置时间帧
+        if (parameters.parm.capture.capability & V4L2_CAP_TIMEPERFRAME) {
+            parameters.parm.capture.timeperframe = {
+                static_cast<unsigned int>(config.frame_rate.den),
+                static_cast<unsigned int>(config.frame_rate.num)
+            };
+            operation = "VIDIOC_S_PARM";
+            if (Ioctl(video_fd, VIDIOC_S_PARM, &parameters) < 0) {
+                return errno;
+            }
+            operation = "VIDIOC_G_PARM after S_PARM";
+            if (Ioctl(video_fd, VIDIOC_G_PARM, &parameters) < 0) {
+                return errno;
+            }
+        }
+        // 视频节点无 TIMEPERFRAME 能力，parameters 为空，会直接进入到下面的校验中
+        interval = parameters.parm.capture.timeperframe;
+    }
+
+    operation = "Invalid reported capture frame interval";
+    if (!interval.numerator || !interval.denominator || interval.numerator > INT_MAX || interval.denominator > INT_MAX) {
+        return EINVAL;
+    }
+    if (!config.allow_negotiation && static_cast<uint64_t>(interval.numerator) * config.frame_rate.num !=
+        static_cast<uint64_t>(interval.denominator) * config.frame_rate.den) {
+        operation = "Device frame rate differs from requested rate";
+        return EINVAL;
+    }
+    return 0;
 }

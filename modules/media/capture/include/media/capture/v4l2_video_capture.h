@@ -3,7 +3,7 @@
 #include <atomic>
 #include <mutex>
 #include <vector>
-
+#include <linux/videodev2.h>
 #include "media/capture/i_video_capture.h"
 #include "media/media_buffer.h"
 
@@ -18,9 +18,10 @@ enum class V4L2DeliveryMode {
 };
 
 class CaptureQueue;
+struct v4l2_fract;
 
 struct V4L2CaptureConfig {
-    std::string device{"/dev/video0"};
+    std::string device{"/dev/video0"};  ///< 视频节点设备
     int width{640};
     int height{360};
     PixelFormat pixel_format{PixelFormat::kYUYV422};
@@ -29,6 +30,8 @@ struct V4L2CaptureConfig {
     std::chrono::milliseconds poll_timeout{100};    
     bool allow_negotiation{false};  ///< 是否允许调整大小、格式或帧率
     V4L2DeliveryMode delivery_mode{V4L2DeliveryMode::MmapLease};    
+    std::string frame_interval_device{};  ///< 视频采集帧率设备, 用于当视频节点未实现 G_PARM 时，查询实际的 sensor 时序参数
+    unsigned int frame_interval_pad{0}; ///< v4l2_subdev_frame_interval 中的 pad 字段，sensor 节点可能有多个 pad，source pad 一般为 0
 };
 
 
@@ -48,8 +51,23 @@ public:
     /// @brief 获取视频帧几何信息
     /// @return 视频帧平面几何信息
     std::vector<PlaneGeometry> Geometry() const;
+
+    /// @brief 配置帧间隔
+    /// @param video_fd 视频设备文件描述符
+    /// @param type 缓冲区类型
+    /// @param config 视频捕获配置
+    /// @param interval 帧间隔
+    /// @param operation 操作描述
+    /// @return 
+    int ConfigureFrameInterval(int video_fd, v4l2_buf_type type, const V4L2CaptureConfig& config, v4l2_fract& interval, const char*& operation);
 private:
     void cleanup() noexcept;
+    /// @brief 读取 sensor 帧间隔
+    /// @param config 视频捕获配置
+    /// @param interval sensor 帧间隔
+    /// @param operation 操作描述
+    /// @return 
+    int readSensorInterval(v4l2_fract& interval, const char*& operation);
     V4L2CaptureConfig config_;
     mutable std::mutex io_mutex_;   ///< I/O 操作互斥锁
     std::mutex wake_mutex_;         ///< 唤醒互斥锁

@@ -35,6 +35,7 @@ bool ProbeIsp(const IspOptions& options, IspTopology& result, std::string& error
 
 namespace detail { class IspBackend; }
 
+/// @brief 枚举 media 拓扑、加载 IQ、AE/AWB/AF 插件、运行 3A 控制循环
 class IspController final {
 public:
     enum class State { Empty, Prepared, Running };
@@ -62,6 +63,7 @@ public:
     State GetState() const noexcept { return state_; }
     const IspTopology& Topology() const noexcept { return topology_; }
 
+    const std::string SensorDevice() const noexcept { return topology_.sensor_device; }
 private:
     std::unique_ptr<detail::IspBackend> backend_;
     State state_ = State::Empty;

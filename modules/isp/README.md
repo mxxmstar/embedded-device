@@ -45,6 +45,14 @@ cmake -S . -B build-isp-rk3399 \
 cmake --build build-isp-rk3399 --target isp_probe test_isp_controller -j4
 ```
 
+```bash
+cmake -S . -B build-isp-loop \
+  -DEMBEDDED_PLATFORM=rockchip -DBUILD_ISP=ON \
+  -DBUILD_MEDIA=ON -DBUILD_V4L2_CAPTURE=ON -DBUILD_RENDER=OFF -DBUILD_TESTS=ON
+
+cmake --build build-isp-loop --target video_capture_loop -j4
+```
+
 RK 平台默认开启 BUILD_ISP，其他平台默认关闭；可显式 `-DBUILD_ISP=OFF`。ISP 是独立的 `Isp::Controller` 库，业务目标需要显式链接该 target，不会在 execution 启动时自动占用摄像头。SDK 路径不写入部署程序 RPATH；板端使用原有 librkisp 与插件，不能仅复制本 overlay 到另一种固件来保证兼容。
 
 ## API 与顺序

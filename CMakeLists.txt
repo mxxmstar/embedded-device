@@ -15,11 +15,13 @@ endif()
 # Each platform owns dependency discovery and backend selection.
 include("${EMBEDDED_PLATFORM_DIR}/CMakeLists.txt")
 add_subdirectory(src/common)
-if(BUILD_ISP)
-    add_subdirectory(modules/isp)
-endif()
+
 if(BUILD_MEDIA)
     add_subdirectory(modules/media)
+endif()
+# media 先于 isp 定义目标，isp 中示例依赖 Media::Capture。
+if(BUILD_ISP)
+    add_subdirectory(modules/isp)
 endif()
 if(BUILD_RENDER)
     add_subdirectory(src/render)
