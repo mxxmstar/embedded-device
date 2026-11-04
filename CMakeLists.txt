@@ -14,7 +14,7 @@ endif()
 
 # Each platform owns dependency discovery and backend selection.
 include("${EMBEDDED_PLATFORM_DIR}/CMakeLists.txt")
-add_subdirectory(src/common)
+add_subdirectory(modules/common)
 
 if(BUILD_MEDIA)
     add_subdirectory(modules/media)
@@ -24,10 +24,10 @@ if(BUILD_ISP)
     add_subdirectory(modules/isp)
 endif()
 if(BUILD_RENDER)
-    add_subdirectory(src/render)
+    add_subdirectory(modules/render)
 endif()
 
-add_executable(execution src/main.cpp)
+add_executable(execution app/main.cpp)
 target_link_libraries(execution PRIVATE common_lib)
 if(BUILD_MEDIA)
     target_link_libraries(execution PRIVATE Media::All)

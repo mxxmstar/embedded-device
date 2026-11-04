@@ -8,11 +8,11 @@ cmake/BuildOptions.cmake              # 功能开关、输出目录
 cmake/FFmpeg.cmake                    # 通用 SDK 查找辅助函数
 platform/generic/setup.cmake          # 宿主机 vcpkg 初始化
 platform/generic/CMakeLists.txt       # Boost / spdlog / FFmpeg 依赖
-src/common/process/generic/process.cpp   # 现有 Boost.Process 实现
-src/common/process/rockchip/process.cpp   # 无 Boost 的 POSIX 进程实现
+modules/common/process/generic/process.cpp   # 现有 Boost.Process 实现
+modules/common/process/rockchip/process.cpp   # 无 Boost 的 POSIX 进程实现
 platform/rockchip/setup.cmake         # ARM64 工具链选择
 platform/rockchip/CMakeLists.txt      # MPP / RGA / spdlog / FFmpeg，无 Boost
-src/common/CMakeLists.txt             # 公共目标与所选进程后端
+modules/common/CMakeLists.txt             # 公共目标与所选进程后端
 modules/media/CMakeLists.txt              # 媒体源码
 ```
 

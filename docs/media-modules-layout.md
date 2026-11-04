@@ -34,7 +34,7 @@ modules/media/
 
 - 顶层 CMake 改为 `add_subdirectory(modules/media)`。
 - 每个实现模块的 CMake 编译本模块 `src/`；公共头文件随模块放置，调用方继续使用 `#include <media/...>`。
-- `Media::Contracts` 是头文件接口集合，汇总各模块公共 `include/`。它不引入 FFmpeg、spdlog、Boost。现有 `common/queue` 头仍从顶层 `include/` 引用，因此源码级媒体模块尚不完全独立于仓库公共头。
+- `Media::Contracts` exposes media module headers and links `Common::Headers` for shared queue headers without linking the process library.
 - `Media::Core` 保留原有公共配置校验职责，因此 Core CMake 仍编译 encoder/pusher/publisher 的配置实现。此轮未扩大为配置库拆分。
 - `backend/include/` 中的头可能使用 AVFrame、AVPacket 等原生类型，只由对应后端目标传播，不加入 Contracts。未来如需发布专用后端开发接口，可以单独选择这些头。
 - `Media::Core`、`Media::Encoder`、`Media::Decoder`、`Media::Input`、`Media::Output`、`Media::Publisher`、`Media::Pipeline`、`Media::All` 等目标名保持不变。
@@ -69,8 +69,8 @@ ctest --test-dir build-modules-core --output-on-failure
 | `modules/media/stream/test` | 脚本输入、重连及时间戳策略 |
 | `modules/media/pipeline/test` | 跨输入、编解码、转换及发布的完整链路集成测试 |
 | `modules/media/capture/test` | V4L2 契约、设备测试及 smoke 工具 |
-| `src/common/process/test` | RK POSIX 进程测试 |
-| `src/render/test` | OpenGL 渲染测试 |
+| `modules/common/process/test` | RK POSIX 进程测试 |
+| `modules/render/test` | OpenGL 渲染测试 |
 
 encoder、decoder、puller 的完整链路目前由 pipeline/test 联合覆盖，未添加空测试占位目录。现有核心功能仍可一次运行 `ctest --test-dir build-modules-layout --output-on-failure`。模块测试可通过 `ctest -R` 按名称筛选；只有 Core 契约入口支持独立顶层配置，其他测试按依赖图随完整工程配置。
 

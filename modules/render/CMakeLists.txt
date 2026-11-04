@@ -1,14 +1,17 @@
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
-file(GLOB_RECURSE RENDER_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-
-add_library(render_lib STATIC ${RENDER_SOURCES})
+add_library(render_lib STATIC
+    video/opengl_video_renderer.cpp
+    video/opengl_dmabuf.cpp)
+add_library(Render::Render ALIAS render_lib)
+target_include_directories(render_lib PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_link_libraries(render_lib
-    PUBLIC common_lib Media::All
-    PRIVATE OpenGL::GL glfw glad::glad)
+    PUBLIC Media::Core
+    PRIVATE Common::Headers spdlog::spdlog OpenGL::GL glfw glad::glad)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(OpenGL QUIET COMPONENTS EGL)

@@ -5,7 +5,7 @@ foreach(module core capture converter decoder encoder puller pusher publisher st
     target_include_directories(media_contracts INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${module}/include>")
 endforeach()
-target_include_directories(media_contracts INTERFACE "${EMBEDDED_SOURCE_ROOT}/include")
+target_link_libraries(media_contracts INTERFACE Common::Headers)
 
 # media 模块公共代码
 add_subdirectory(core)

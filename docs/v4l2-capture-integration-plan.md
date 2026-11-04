@@ -51,7 +51,7 @@ FFmpeg 开发包路径：`/home/ub22/vcpkg_env/ffmpeg-n8.1-latest-linux64-gpl-sh
 | `src/media/decoder/ffmpeg_decoder.cpp` | 显式支持 JPEG/H.264 等；视频 pix_fmt 固定为 NONE | 增加 rawvideo 解码适配，使用已协商的像素格式 |
 | `converter`、`encoder`、`publisher`、`pusher` | 已有帧转换和编码输出能力 | 复用，按目标选择 I420/NV12；压缩包直推另测兼容性 |
 | `src/media/stream/stream_source.cpp` | 骨架，且被 CMake 排除 | 首版测试直接组合 Session 与下游，不依赖 Source 完成 |
-| `src/main.cpp` | 仅 Hello World | 需要独立采集示例/集成测试，尚无可直接切换的完整应用入口 |
+| `app/main.cpp` | 仅 Hello World | 需要独立采集示例/集成测试，尚无可直接切换的完整应用入口 |
 | `CMakeLists.txt` | 已链接 avdevice；递归收集媒体 cpp | FFmpeg 路径无须新库；原生实现需 Linux 条件编译 |
 
 两个特别需要防止的误判：

@@ -1,6 +1,6 @@
 # Rockchip Pusher：工程内 MP4 → RTSP
 
-本轮只推进 Pusher，`src/main.cpp` 不变。FFmpeg 的封装/推流实现可以在 generic 与 Rockchip 间共享，不属于某一芯片；只有 Pusher 的实现目录从 generic 改为 ffmpeg，其它模块不做目录迁移。
+本轮只推进 Pusher，`app/main.cpp` 不变。FFmpeg 的封装/推流实现可以在 generic 与 Rockchip 间共享，不属于某一芯片；只有 Pusher 的实现目录从 generic 改为 ffmpeg，其它模块不做目录迁移。
 
 ## 实际调用链
 
