@@ -1,6 +1,6 @@
 #pragma once
 #if 1
-#include "media/encoder/i_encoder.h"
+#include "encoder.h"
 #include <memory>
 
 extern "C" {

@@ -4,6 +4,7 @@ add_test(NAME test_capture_contract COMMAND test_capture_contract)
 
 add_executable(v4l2_capture_smoke v4l2_capture_smoke.cpp)
 target_link_libraries(v4l2_capture_smoke PRIVATE Media::All)
+target_include_directories(v4l2_capture_smoke PRIVATE "${EMBEDDED_SOURCE_ROOT}/modules/media/encoder/src/generic")
 if(BUILD_RENDER)
     target_compile_definitions(v4l2_capture_smoke PRIVATE V4L2_SMOKE_RENDER=1)
     find_package(glad CONFIG REQUIRED)

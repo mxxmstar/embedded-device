@@ -354,3 +354,7 @@ void FFmpegPusher::SetEventCallback(EventCallback cb) {
     std::lock_guard<std::mutex> lock(callback_mutex_);
     event_cb_ = std::move(cb);
 }
+
+std::unique_ptr<IPusher> CreateMediaPusher() {
+    return std::make_unique<FFmpegPusher>();
+}

@@ -1,7 +1,7 @@
 #include "media/media_packet_buffer.h"
 #include "media/generic/ffmpeg_packet_utils.h"
 #include "media/converter/generic/media_frame_converter.h"
-#include "media/encoder/generic/ffmpeg_encoder.h"
+#include "ffmpeg_encoder.h"
 #include "media/decoder/generic/ffmpeg_decoder.h"
 #include <algorithm>
 #include <cstring>

@@ -81,7 +81,7 @@ struct FFmpegPusherConfig {
 struct PusherConfig {
     std::string output_url;           ///< 输出文件路径或输出协议 URL
     MediaTrackConfig video_track;     ///< 已编码视频轨道的参数与时间基
-    PusherIoConfig io;                ///< 0 禁用超时，负数无效
+    PusherIoConfig io{};                ///< 0 禁用超时，负数无效
     FFmpegPusherConfig ffmpeg;        ///< FFmpeg 输出配置
     bool is_valid() const;
 };

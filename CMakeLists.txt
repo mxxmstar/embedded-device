@@ -28,11 +28,21 @@ if(BUILD_RENDER)
 endif()
 
 add_executable(execution app/main.cpp)
+if(TARGET Isp::Controller AND TARGET Media::Capture AND TARGET Media::Encoder AND TARGET Media::Publisher)
+    add_executable(capture_loop_pusher app/capture_loop_pusher.cpp)
+    target_link_libraries(capture_loop_pusher PRIVATE common_lib
+        Isp::Controller Media::Capture Media::Encoder Media::Publisher)
+    set_target_properties(capture_loop_pusher PROPERTIES SKIP_BUILD_RPATH TRUE)
+    copy_runtime_dependencies(capture_loop_pusher)
+endif()
+
 target_link_libraries(execution PRIVATE common_lib)
+
 if(BUILD_MEDIA)
     target_link_libraries(execution PRIVATE Media::All)
 endif()
 if(BUILD_RENDER)
     target_link_libraries(execution PRIVATE render_lib)
+    # target_link_libraries(capture_loop_pusher PRIVATE render_lib)
 endif()
 copy_runtime_dependencies(execution)

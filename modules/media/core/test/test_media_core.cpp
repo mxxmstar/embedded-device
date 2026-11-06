@@ -1,7 +1,7 @@
 #include "media/media_timestamp.h"
 #include "media/converter/i_frame_converter.h"
 #include "media/decoder/i_decoder.h"
-#include "media/encoder/i_encoder.h"
+#include "media/encoder/encoder.h"
 #include "media/puller/i_puller.h"
 #include "media/pusher/i_pusher.h"
 #include <limits>

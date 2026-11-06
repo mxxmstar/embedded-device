@@ -1,5 +1,5 @@
 #if 1
-#include "media/encoder/generic/ffmpeg_encoder.h"
+#include "ffmpeg_encoder.h"
 #include "media/converter/generic/media_frame_converter.h"
 
 #include "common/log/logger.h"
@@ -835,5 +835,9 @@ void FFmpegEncoder::PrintStats() const {
     LOG_INFO("FFmpegEncoderStats: avg_encode_time(ms): {}", avg_encode_time / 1000.0);
 }
 #endif
+
+std::unique_ptr<IEncoder> CreateEncoder() {
+    return std::make_unique<FFmpegEncoder>();
+}
 
 #endif

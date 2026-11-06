@@ -74,16 +74,13 @@ enum class PusherSessionState {
 struct PusherSessionConfig {
     PusherConfig pusher;
     PusherSessionMode mode{PusherSessionMode::Synchronous};
-    PusherAsyncConfig async;
-    PusherTimestampPolicy timestamp_policy;
-    PusherReconnectPolicy reconnect_policy;
+    PusherAsyncConfig async{};
+    PusherTimestampPolicy timestamp_policy{};
+    PusherReconnectPolicy reconnect_policy{};
 
     bool is_valid() const {
-        const bool valid_mode = mode == PusherSessionMode::Synchronous ||
-                                mode == PusherSessionMode::Asynchronous;
-        return valid_mode && pusher.is_valid() &&
-               (mode != PusherSessionMode::Asynchronous ||
-                async.queue_capacity > 0);
+        const bool valid_mode = mode == PusherSessionMode::Synchronous || mode == PusherSessionMode::Asynchronous;
+        return valid_mode && pusher.is_valid() && (mode != PusherSessionMode::Asynchronous || async.queue_capacity > 0);
     }
 };
 

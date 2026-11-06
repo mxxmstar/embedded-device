@@ -25,8 +25,13 @@ endfunction()
 if(MEDIA_FFMPEG_FULL OR MEDIA_FFMPEG_ROCKCHIP)
     add_subdirectory(ffmpeg)
     add_subdirectory(diagnostics)
+    if(MEDIA_FFMPEG_FULL)
+        add_subdirectory(converter)
+    endif()
+    add_subdirectory(encoder)
     add_subdirectory(pusher)
-    target_link_libraries(media_modules INTERFACE Media::Output)
+    add_subdirectory(publisher)
+    target_link_libraries(media_modules INTERFACE Media::Output Media::Encoder Media::Publisher)
 endif()
 
 # 非 x86 平台的 media 模块处理
@@ -51,7 +56,7 @@ if(NOT MEDIA_FFMPEG_FULL)
 endif()
 
 # 完整的 media 模块处理，包括 capture、converter、encoder、decoder、puller、publisher、stream 等子模块
-foreach(module converter encoder decoder puller publisher stream)
+foreach(module decoder puller stream)
     add_subdirectory(${module})
 endforeach()
 foreach(module converter encoder decoder input output publisher pipeline)

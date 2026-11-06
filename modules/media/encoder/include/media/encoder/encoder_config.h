@@ -27,6 +27,7 @@ struct VideoEncoderConfig {
     std::string preset{"ultrafast"}; // 编码器 preset（支持 preset 参数的编码器使用）
     std::string tune{"zerolatency"}; // 编码器 tune 参数（如 zerolatency 通过禁用 B 帧、关闭参考帧缓存来降低延迟）
     int crf{-1};                     // CRF 质量控制值（< 0 表示不启用）
+    bool is_valid() const;
     void Dump() const;
 };
 
@@ -54,7 +55,7 @@ struct EncoderConfig {
 
     std::string encoder_name;        // 指定的 FFmpeg 编码器名称（如 "libx264"），为空则自动选择
         
-    bool global_header{false};       // 是否在 extradata 中存储全局头信息
+    bool global_header{false};       // 是否在 extradata 中存储全局头信息（每帧都能独立解码）
     int thread_count{1};             // 编码线程数
     bool is_valid() const;
     

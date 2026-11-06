@@ -9,6 +9,7 @@
 #include "media_buffer.h"
 #include "frame_layout.h"
 #include "media_packet.h"
+#include "media_timestamp.h"
 
 /// 像素格式
 enum class PixelFormat {
@@ -35,13 +36,6 @@ enum class SampleFormat {
     S32P,      ///< 32 位有符号整数，平面格式
     FLTP,      ///< 单精度浮点数，平面格式
     DBLP,      ///< 双精度浮点数，平面格式
-};
-
-/// @brief 时间戳
-struct MediaTime {
-    int64_t pts_us{0};   ///< 显示时间戳（微秒）
-    int64_t dts_us{0};   ///< 解码时间戳（微秒）
-    int64_t duration_us{0}; ///< 持续时间（微秒）
 };
 
 /// @brief struct VideoFrameMeta 视频帧元数据

@@ -1,7 +1,7 @@
 #include "media/capture/v4l2_video_capture.h"
 #include "media/capture/video_capture_session.h"
 #include "media/converter/generic/media_frame_converter.h"
-#include "media/encoder/generic/ffmpeg_encoder.h"
+#include "ffmpeg_encoder.h"
 #include "media/publisher/publisher.h"
 
 #ifdef V4L2_SMOKE_RENDER

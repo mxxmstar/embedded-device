@@ -6,8 +6,6 @@
 #include <memory>
 #include <utility>
 
-#include "media/pusher/pusher_factory.h"
-
 namespace {
 /// @brief 从 packet 中提取最早的 timestamp 值，包括 pts 和 dts
 std::optional<std::int64_t> EarliestTimestamp(const MediaPacket& packet) {

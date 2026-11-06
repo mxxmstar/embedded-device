@@ -1,9 +1,10 @@
 #pragma once
 
+#include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <utility>
-#include <functional>
 
 #include "media/media_packet.h"
 #include "media/pusher/pusher_config.h"
@@ -100,3 +101,8 @@ public:
     /// 不得再调用旧回调，以便 Session 安全析构。
     virtual void SetEventCallback(EventCallback cb) { (void)cb; }
 };
+
+/// @brief 创建默认的媒体输出实现。
+/// @details 由链接目标选择后端实现（当前为 FFmpegPusher），调用方无需
+///          感知具体后端类型。
+std::unique_ptr<IPusher> CreateMediaPusher();

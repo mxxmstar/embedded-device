@@ -13,7 +13,7 @@
 #include "media/puller/generic/ffmpeg_puller.h"
 #include "media/decoder/generic/ffmpeg_decoder.h"
 #include "media/converter/generic/media_frame_converter.h"
-#include "media/encoder/generic/ffmpeg_encoder.h"
+#include "ffmpeg_encoder.h"
 #include "media/publisher/publisher.h"
 #include "media/generic/ffmpeg_frame_owner.h"
 #include "media/media_buffer.h"

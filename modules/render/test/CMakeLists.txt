@@ -1,6 +1,7 @@
 find_package(glad CONFIG REQUIRED)
 
 add_executable(test_opengl_video_renderer test_opengl_video_renderer.cpp)
+target_include_directories(test_opengl_video_renderer PRIVATE "${EMBEDDED_SOURCE_ROOT}/modules/media/encoder/src/generic")
 target_link_libraries(test_opengl_video_renderer PRIVATE Media::All render_lib Common::Headers spdlog::spdlog glad::glad)
 set_target_properties(test_opengl_video_renderer PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests")

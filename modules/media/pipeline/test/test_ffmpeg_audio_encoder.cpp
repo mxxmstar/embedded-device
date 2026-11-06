@@ -1,4 +1,4 @@
-#include "media/encoder/generic/ffmpeg_encoder.h"
+#include "ffmpeg_encoder.h"
 #include "media/converter/generic/media_frame_converter.h"
 #include "media/generic/ffmpeg_format.h"
 
