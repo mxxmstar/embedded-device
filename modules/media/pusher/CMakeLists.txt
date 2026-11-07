@@ -1,5 +1,15 @@
-media_module(media_output src/ffmpeg/ffmpeg_pusher.cpp src/ffmpeg/ffmpeg_muxer.cpp)
+add_library(media_output STATIC src/ffmpeg/ffmpeg_pusher.cpp src/ffmpeg/ffmpeg_muxer.cpp)
+target_link_libraries(media_output PUBLIC Media::Core)
+target_include_directories(media_output PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_link_libraries(media_output PUBLIC media_ffmpeg media_diagnostics)
 add_library(Media::Output ALIAS media_output)
-media_module(media_pusher_session src/pusher_session.cpp src/async_pusher_session.cpp)
+add_library(media_pusher_session STATIC src/pusher_session.cpp src/async_pusher_session.cpp)
+target_link_libraries(media_pusher_session PUBLIC Media::Core)
+target_include_directories(media_pusher_session PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_link_libraries(media_pusher_session PUBLIC media_output Threads::Threads)
+if(MSVC)
+    target_compile_options(media_output PRIVATE /utf-8)
+    target_compile_options(media_pusher_session PRIVATE /utf-8)
+endif()

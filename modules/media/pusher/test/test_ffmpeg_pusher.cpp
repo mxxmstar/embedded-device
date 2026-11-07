@@ -1,4 +1,4 @@
-#include "media/pusher/ffmpeg/ffmpeg_pusher.h"
+#include "ffmpeg_pusher.h"
 
 #include <cerrno>
 #include <filesystem>

@@ -26,7 +26,7 @@ test_mp4_rtsp_pusher（libavformat 读取 MP4、按 DTS 实时投递）
 
 ```text
 modules/media/pusher/src/ffmpeg/
-modules/media/pusher/backend/include/media/pusher/ffmpeg/
+modules/media/pusher/src/ffmpeg/
 modules/media/pusher/test/test_mp4_rtsp_pusher.cpp
 cmake/FFmpeg.cmake
 ```

@@ -103,6 +103,5 @@ public:
 };
 
 /// @brief 创建默认的媒体输出实现。
-/// @details 由链接目标选择后端实现（当前为 FFmpegPusher），调用方无需
-///          感知具体后端类型。
+/// @details 由链接目标选择后端实现（当前为 FFmpegPusher），调用方无需感知具体后端类型。
 std::unique_ptr<IPusher> CreateMediaPusher();

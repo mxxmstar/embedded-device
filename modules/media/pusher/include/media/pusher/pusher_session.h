@@ -11,7 +11,7 @@
 #include <thread>
 
 #include "common/queue/blocking_mpmc_queue.h"
-#include "media/pusher/i_pusher.h"
+#include "media/pusher/pusher.h"
 
 enum class PusherTimestampMode {
     Preserved, ///< 保留编码器输出的视频源原始时间戳，不进行转换

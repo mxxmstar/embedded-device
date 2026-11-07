@@ -603,7 +603,10 @@ int main() {
     }
     interrupted_writer.join();
     const auto interrupted_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
-    while (interrupted_session.State() != PusherSessionState::Failed &&
+    // Publish can enter Failed before the event thread acquires the operation
+    // lock and records LastEvent. Wait for both stages of event handling.
+    while ((interrupted_session.State() != PusherSessionState::Failed ||
+            !interrupted_session.LastEvent().has_value()) &&
            std::chrono::steady_clock::now() < interrupted_deadline) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
@@ -611,7 +614,11 @@ int main() {
         !IsFailedWith(interrupted_result, PusherErrorCategory::Cancelled) ||
         interrupted_session.State() != PusherSessionState::Failed ||
         !interrupted_session.LastEvent().has_value()) {
-        std::cerr << "Async event did not interrupt blocked Push" << std::endl;
+        std::cerr << "Async event did not interrupt blocked Push: stop_calls="
+                  << interrupted->stop_calls.load()
+                  << ", cancelled=" << IsFailedWith(interrupted_result, PusherErrorCategory::Cancelled)
+                  << ", failed=" << (interrupted_session.State() == PusherSessionState::Failed)
+                  << ", has_event=" << interrupted_session.LastEvent().has_value() << std::endl;
         return 1;
     }
     if (!interrupted_session.Close().Succeed()) return 1;

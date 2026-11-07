@@ -3,7 +3,7 @@
 #include "media/decoder/i_decoder.h"
 #include "media/encoder/encoder.h"
 #include "media/puller/i_puller.h"
-#include "media/pusher/i_pusher.h"
+#include "media/pusher/pusher.h"
 #include <limits>
 #include <iostream>
 int main() {

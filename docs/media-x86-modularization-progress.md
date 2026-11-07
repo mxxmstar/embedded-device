@@ -44,7 +44,7 @@ include/media/converter/i_frame_converter.h
 include/media/encoder/encoder.h
 include/media/decoder/i_decoder.h
 include/media/puller/i_puller.h
-include/media/pusher/i_pusher.h
+modules/media/pusher/include/media/pusher/pusher.h
 ```
 
 FFmpeg 具体头文件与实现下沉到 `generic/`：

@@ -3,8 +3,8 @@
 #include <chrono>
 #include <mutex>
 
-#include "media/pusher/ffmpeg/ffmpeg_muxer.h"
-#include "media/pusher/i_pusher.h"
+#include "ffmpeg_muxer.h"
+#include "media/pusher/pusher.h"
 
 struct MuxerError;
 PusherResult MapMuxerError(const MuxerError& error, bool network_output);
